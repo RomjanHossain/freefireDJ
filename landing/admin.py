@@ -10,7 +10,7 @@ class CarasolModelAdmin(admin.ModelAdmin):
     list_display = (
         "carasol_title",
         "carasol_link",
-        "carasol_image",
+        # "carasol_image",
     )
     list_editable = ("carasol_link",)
     list_per_page = 10

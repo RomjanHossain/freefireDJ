@@ -7,7 +7,8 @@ from landing.models import (Buy, CarasolModel, ContactUs, Items, NewUser,
 class CarasolModelSerializer(ModelSerializer):
     class Meta:
         model = CarasolModel
-        fields = "__all__"
+        # fields = "__all__"
+        exclude = ["carasol_id", "carasol_date"]
 
 
 class ServicesSerializer(ModelSerializer):
@@ -53,16 +54,6 @@ class NewUserSerializer(ModelSerializer):
             first_name=cleaned_data["first_name"],
             last_name=cleaned_data["last_name"],
         )
-
-        # user = NewUser.objects.create_user(**validated_data)
-        # user = NewUser.objects.create_user(
-        #     username=validated_data["username"],
-        #     phone=validated_data["phone"],
-        #     email=validated_data["email"],
-        #     password=validated_data["password"],
-        #     first_name=validated_data.get("first_name", ""),
-        #     last_name=validated_data.get("last_name", ""),
-        # )
         user.set_password(validated_data["password"])
         user.save()
         return user
@@ -88,3 +79,18 @@ class NewUserSerializer(ModelSerializer):
             "phone": {"required": True},
             "email": {"required": True},
         }
+
+
+class UpdateUserSerializer(ModelSerializer):
+    class Meta:
+        model = NewUser
+        fields = ("email", "first_name", "last_name", "phone", "username", "password")
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get("email", instance.email)
+        instance.first_name = validated_data.get("first_name", instance.first_name)
+        instance.last_name = validated_data.get("last_name", instance.last_name)
+        instance.phone = validated_data.get("phone", instance.phone)
+        instance.username = validated_data.get("username", instance.username)
+        instance.save()
+        return instance

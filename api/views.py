@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import (CreateAPIView, ListAPIView,
+                                     RetrieveAPIView, UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
@@ -8,7 +9,7 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
 from api.serializations import (BuySerializer, CarasolModelSerializer,
                                 ContactUsSerializer, ItemsSerializer,
                                 NewUserSerializer, PaymentMethodSerializer,
-                                ServicesSerializer)
+                                ServicesSerializer, UpdateUserSerializer)
 from landing.models import (Buy, CarasolModel, ContactUs, Items, NewUser,
                             PaymentMethod, Services)
 
@@ -17,15 +18,30 @@ class CarasolModelListAPIView(RetrieveAPIView):
     queryset = CarasolModel.objects.all()
     serializer_class = CarasolModelSerializer
 
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
 
 class ServicesListAPIView(RetrieveAPIView):
     queryset = Services.objects.all()
     serializer_class = ServicesSerializer
 
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
 
 class ItemsListAPIView(RetrieveAPIView):
     queryset = Items.objects.all()
     serializer_class = ItemsSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class PaymentMethodListAPIView(RetrieveAPIView):
@@ -60,46 +76,6 @@ class RegisterAPIView(CreateAPIView):
     queryset = NewUser.objects.all()
     model = NewUser()
     serializer_class = NewUserSerializer
-    # serializer_class = NewUserSerializer
-
-    # def post(self, request, *args, **kwargs):
-    #     # serializer = self.serializer_class(data=request.data)
-    #     # check if user already exists
-    #     if NewUser.objects.filter(email=request.data["email"]).exists():
-    #         return Response({"error": "Email already exists"}, status=HTTP_409_CONFLICT)
-    #     if NewUser.objects.filter(username=request.data["phone"]).exists():
-    #         return Response(
-    #             {"error": "Phone number already exists"}, status=HTTP_409_CONFLICT
-    #         )
-    #     # check if passwords match
-    #     if request.data["password"] != request.data["password2"]:
-    #         return Response(
-    #             {"error": "Passwords don't match"}, status=HTTP_400_BAD_REQUEST
-    #         )
-    #     # create the user and save it to the database and return 201 status code
-    #     user = NewUser.objects.create_user(
-    #         username=request.data["phone"],
-    #         email=request.data["email"],
-    #         password=request.data["password"],
-    #         # first name and last name are optional
-    #         first_name=request.data.get("first_name", ""),
-    #         last_name=request.data.get("last_name", ""),
-    #     )
-    #     user.save()
-    #     return Response({"success": "User created"}, status=HTTP_201_CREATED)
-
-    # if serializer.is_valid():
-    #     serializer.save()
-    #     return Response(serializer.data, status=HTTP_200_OK)
-
-    # user = NewUser.objects.create_user(
-    #     username=request.data["username"],
-    #     phone=request.data["phone"],
-    #     email=request.data["email"],
-    #     password=request.data["password"],
-    # )
-    # user.save()
-    # return Response({"message": "User created successfully"}, status=HTTP_200_OK)
 
 
 # get the user profile
@@ -115,20 +91,22 @@ class ProfileAPIView(RetrieveAPIView):
 
 
 # update the user profile
-class UpdateProfileAPIView(RetrieveAPIView):
+class UpdateProfileAPIView(UpdateAPIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = NewUserSerializer
+    serializer_class = UpdateUserSerializer
 
     def get_queryset(self):
         return NewUser.objects.filter(id=self.request.user.id)
 
-    def post(self, request, *args, **kwargs):
-        user = NewUser.objects.get(id=self.request.user.id)
-        user.username = request.data["username"]
-        user.phone = request.data["phone"]
-        user.email = request.data["email"]
-        user.save()
-        return Response({"message": "User updated successfully"}, status=HTTP_200_OK)
+    def put(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(
+            queryset, data=request.data, partial=True, many=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 # logout the user
