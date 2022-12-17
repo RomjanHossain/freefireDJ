@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from rest_framework.generics import (CreateAPIView, ListAPIView,
                                      RetrieveAPIView, UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
@@ -15,6 +14,7 @@ from landing.models import (Buy, CarasolModel, ContactUs, Items, NewUser,
 
 
 class CarasolModelListAPIView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = CarasolModel.objects.all()
     serializer_class = CarasolModelSerializer
 
@@ -25,6 +25,7 @@ class CarasolModelListAPIView(RetrieveAPIView):
 
 
 class ServicesListAPIView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Services.objects.all()
     serializer_class = ServicesSerializer
 
@@ -35,6 +36,7 @@ class ServicesListAPIView(RetrieveAPIView):
 
 
 class ItemsListAPIView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Items.objects.all()
     serializer_class = ItemsSerializer
 
@@ -45,18 +47,40 @@ class ItemsListAPIView(RetrieveAPIView):
 
 
 class PaymentMethodListAPIView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = PaymentMethod.objects.all()
     serializer_class = PaymentMethodSerializer
 
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
 
 class BuyListAPIView(RetrieveAPIView):
-    queryset = Buy.objects.all()
+    permission_classes = [IsAuthenticated]
+    # queryset = Buy.objects.all()
     serializer_class = BuySerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Buy.objects.filter(user=user)
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class ContactUsListAPIView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = ContactUs.objects.all()
     serializer_class = ContactUsSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 # get the user buy history

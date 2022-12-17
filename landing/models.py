@@ -49,6 +49,9 @@ class Items(models.Model):
     diamond = models.IntegerField()
     service = models.ForeignKey(Services, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str(self.id)
+
     class Meta:
         verbose_name_plural = "Items"
 
@@ -85,7 +88,7 @@ class Buy(models.Model):
     trxId = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
     class Meta:
         verbose_name_plural = "Buy"
