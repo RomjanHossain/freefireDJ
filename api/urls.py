@@ -11,7 +11,7 @@ urlpatterns = [
     path("login/", obtain_auth_token, name="login"),
     path("register/", RegisterAPIView.as_view(), name="register"),
     path("profile/", ProfileAPIView.as_view(), name="profile"),
-    path("update/", UpdateProfileAPIView.as_view(), name="update"),
+    path("update/<pk>/", UpdateProfileAPIView.as_view(), name="update"),
     path("logout/", LogoutAPIView.as_view(), name="logout"),
     # landing stuff
     path("carasol/", CarasolModelListAPIView.as_view(), name="carasol"),
