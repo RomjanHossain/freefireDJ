@@ -111,7 +111,7 @@ class ProfileAPIView(RetrieveAPIView):
         return NewUser.objects.filter(id=self.request.user.id)
 
     def get(self, request, *args, **kwargs):
-        return Response(self.get_queryset().values())
+        return Response(self.get_queryset().values()[0])
 
 
 # update the user profile
@@ -122,11 +122,23 @@ class UpdateProfileAPIView(UpdateAPIView):
     def get_queryset(self):
         return NewUser.objects.filter(id=self.request.user.id)
 
-    def put(self, request, *args, **kwargs):
+    def get_object(self):
+        pk = self.kwargs["pk"]
         queryset = self.get_queryset()
+        obj = queryset.get(pk=pk)
+        return obj
+
+    def put(self, request, *args, **kwargs):
+        # queryset = self.get_queryset().first()
+        queryset = self.get_object()
         serializer = self.get_serializer(
-            queryset, data=request.data, partial=True, many=True
+            queryset,
+            data=request.data,
+            partial=True,
         )
+        # serializer = self.get_serializer(
+        #     queryset, data=request.data, partial=True, many=True
+        # )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=HTTP_200_OK)
