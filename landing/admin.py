@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import (Buy, CarasolModel, ContactUs, Items, NewUser,
+from .models import (Buy, CarasolModel, ContactUs, ImageModel, Items, NewUser,
                      PaymentMethod, Services)
 
 
@@ -25,7 +25,7 @@ class ServicesAdmin(admin.ModelAdmin):
 
 @admin.register(Items)
 class ItemsAdmin(admin.ModelAdmin):
-    list_display = ("price", "diamond")
+    list_display = ("display_service", "price", "diamond")
     list_editable = ("price",)
     list_display_links = ("diamond",)
     list_per_page = 10
@@ -53,6 +53,18 @@ class BuyAdmin(admin.ModelAdmin):
     list_editable = ("status",)
     list_per_page = 10
     search_fields = ("user", "payment_method", "status", "sender_number", "trxId")
+
+
+@admin.register(ImageModel)
+class ImageModelAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "uploaded_at",
+        "image",
+    )
+    list_per_page = 10
+    editable = ("image",)
+    search_fields = ("user",)
 
 
 # @admin.register(NewUser)
