@@ -1,5 +1,5 @@
 from django.contrib.auth import update_session_auth_hash
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import (CreateAPIView, ListAPIView,
                                      RetrieveAPIView, RetrieveUpdateAPIView,
                                      UpdateAPIView)
@@ -227,13 +227,11 @@ class ChangePasswordView(UpdateAPIView):
 
 # get image detail
 @api_view(["GET"])
-def image_detail(
-    request,
-):
+def image_detail(request):
     try:
         # image = ImageModel.objects.get(pk=pk)
         # get image using user
-        _image = ImageModel.objects.filter(user_id=request.user.id)
+        _image = ImageModel.objects.filter(user=request.auth.key)
     except ImageModel.DoesNotExist:
         return Response(status=HTTP_404_NOT_FOUND)
 
@@ -244,11 +242,16 @@ def image_detail(
 
 # upload image
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def image_upload(request):
+    # only allow authenticated users to upload images
+
     if request.method == "POST":
         _user = request.user
-        _image = request.FILES["image"]
+        _image = request.FILES.get("image")
         serializer = ImageSerializer(data={"user": _user, "image": _image})
+        print("this is image -> ", _image)
+        print("this is user -> ", _user)
         # serializer = ImageSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -256,6 +259,28 @@ def image_upload(request):
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
     # get method is not allowed
     return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
+
+
+# convert that image_upload function into a class based view
+class ImageUploadView(CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ImageSerializer
+
+    def post(self, request, *args, **kwargs):
+        # get user field data
+        _user = request.data.get("user")
+        _image = request.FILES.get("image")
+        print("this is image -> ", _image)
+        print("this is user -> ", _user)
+        serializer = self.get_serializer(data={"user": _user, "image": _image})
+        if serializer.is_valid():
+            # check if user has already uploaded an image
+            if ImageModel.objects.filter(user=_user).exists():
+                # delete the previous image
+                ImageModel.objects.filter(user=_user).delete()
+            serializer.save()
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 # upload the user profile picture and get the user profile picture

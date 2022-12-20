@@ -2,9 +2,9 @@ from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 
 from .views import (BuyHistoryAPIView, BuyListAPIView, CarasolModelListAPIView,
-                    ChangePasswordView, ContactUsListAPIView, ItemsListAPIView,
-                    LogoutAPIView, PaymentMethodListAPIView, ProfileAPIView,
-                    ProfilePictureAPIView, RegisterAPIView,
+                    ChangePasswordView, ContactUsListAPIView, ImageUploadView,
+                    ItemsListAPIView, LogoutAPIView, PaymentMethodListAPIView,
+                    ProfileAPIView, ProfilePictureAPIView, RegisterAPIView,
                     ServicesListAPIView, UpdateProfileAPIView, image_detail,
                     image_upload)
 
@@ -22,7 +22,7 @@ urlpatterns = [
     ),
     # upload image
     # path("upload-image/", ProfilePictureAPIView.as_view(), name="upload-image"),
-    path("upload-images/", image_upload, name="image_upload"),
+    path("upload-images/", ImageUploadView.as_view(), name="image_upload"),
     path("get-images/", image_detail, name="image_detail"),
     # landing stuff
     path("carasol/", CarasolModelListAPIView.as_view(), name="carasol"),

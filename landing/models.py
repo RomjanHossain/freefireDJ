@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, User
 from django.db import models
+from rest_framework.authtoken.models import Token
 
 
 class NewUser(AbstractUser):
@@ -121,8 +122,10 @@ class ContactUs(models.Model):
 class ImageModel(models.Model):
     id = models.AutoField(primary_key=True)
     image = models.ImageField(upload_to="profile/")
-    user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
+    user = models.CharField(max_length=50)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        # user = Token.objects.get(key=self.user)
+        # return self.user.username
+        return self.user
