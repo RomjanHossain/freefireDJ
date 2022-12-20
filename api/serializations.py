@@ -128,4 +128,5 @@ class ChangePasswordSerializer(ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageModel
+        # fields = ("image",)
         fields = "__all__"
