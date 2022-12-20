@@ -1,16 +1,23 @@
+from django.contrib.auth import update_session_auth_hash
+from rest_framework.decorators import api_view
 from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     RetrieveAPIView, UpdateAPIView)
+                                     RetrieveAPIView, RetrieveUpdateAPIView,
+                                     UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
-                                   HTTP_400_BAD_REQUEST, HTTP_409_CONFLICT)
+                                   HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST,
+                                   HTTP_404_NOT_FOUND,
+                                   HTTP_405_METHOD_NOT_ALLOWED,
+                                   HTTP_409_CONFLICT)
 
 from api.serializations import (BuySerializer, CarasolModelSerializer,
-                                ContactUsSerializer, ItemsSerializer,
+                                ChangePasswordSerializer, ContactUsSerializer,
+                                ImageSerializer, ItemsSerializer,
                                 NewUserSerializer, PaymentMethodSerializer,
                                 ServicesSerializer, UpdateUserSerializer)
-from landing.models import (Buy, CarasolModel, ContactUs, Items, NewUser,
-                            PaymentMethod, Services)
+from landing.models import (Buy, CarasolModel, ContactUs, ImageModel, Items,
+                            NewUser, PaymentMethod, Services)
 
 
 class CarasolModelListAPIView(RetrieveAPIView):
@@ -37,8 +44,12 @@ class ServicesListAPIView(RetrieveAPIView):
 
 class ItemsListAPIView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = Items.objects.all()
+    # queryset = Items.objects.all()
     serializer_class = ItemsSerializer
+
+    def get_queryset(self):
+        queryset = Items.objects.filter(service_id=self.kwargs["pk"])
+        return queryset
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -156,3 +167,133 @@ class LogoutAPIView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         request.user.auth_token.delete()
         return Response({"message": "User logged out successfully"}, status=HTTP_200_OK)
+
+
+# change password
+# class ChangePasswordAPIView(UpdateAPIView):
+#     permission_classes = (IsAuthenticated,)
+#     serializer_class = ChangePasswordSerializer
+
+#     def get_queryset(self):
+#         return NewUser.objects.filter(id=self.request.user.id)
+
+#     def get_object(self):
+#         pk = self.kwargs["pk"]
+#         queryset = self.get_queryset()
+#         obj = queryset.get(pk=pk)
+#         return obj
+
+#     def put(self, request, *args, **kwargs):
+#         queryset = self.get_object()
+#         serializer = self.get_serializer(
+#             queryset,
+#             data=request.data,
+#             partial=True,
+#         )
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=HTTP_200_OK)
+#         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)  # noqa
+
+
+class ChangePasswordView(UpdateAPIView):
+    model = NewUser
+    serializer_class = ChangePasswordSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response(
+                    {"old_password": ["Wrong password."]},
+                    status=HTTP_400_BAD_REQUEST,
+                )
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            update_session_auth_hash(request, self.object)
+            return Response("Success.", status=HTTP_200_OK)
+
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
+# get image detail
+@api_view(["GET"])
+def image_detail(
+    request,
+):
+    try:
+        # image = ImageModel.objects.get(pk=pk)
+        # get image using user
+        _image = ImageModel.objects.filter(user_id=request.user.id)
+    except ImageModel.DoesNotExist:
+        return Response(status=HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        serializer = ImageSerializer(_image, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
+
+# upload image
+@api_view(["POST"])
+def image_upload(request):
+    if request.method == "POST":
+        _user = request.user
+        _image = request.FILES["image"]
+        serializer = ImageSerializer(data={"user": _user, "image": _image})
+        # serializer = ImageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+    # get method is not allowed
+    return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
+
+
+# upload the user profile picture and get the user profile picture
+class ProfilePictureAPIView(RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ImageSerializer
+    model = ImageModel()
+
+    def get_queryset(self):
+        return ImageModel.objects.filter(user=self.request.user)
+
+    # def get_queryset(self):
+    #     return NewUser.objects.filter(id=self.request.user.id)
+
+    def get_object(self):
+        pk = self.kwargs["pk"]
+        queryset = self.get_queryset()
+        obj = queryset.get(pk=pk)
+        return obj
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_object()
+        serializer = self.get_serializer(queryset)
+        return Response(serializer.data, status=HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
+        queryset = self.get_object()
+        serializer = self.get_serializer(
+            queryset,
+            data=request.data,
+            partial=True,
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        queryset = self.get_object()
+        queryset.profile_picture.delete()
+        return Response(status=HTTP_204_NO_CONTENT)

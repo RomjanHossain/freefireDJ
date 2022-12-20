@@ -49,6 +49,9 @@ class Items(models.Model):
     diamond = models.IntegerField()
     service = models.ForeignKey(Services, on_delete=models.CASCADE)
 
+    def display_service(self):
+        return self.service.title
+
     def __str__(self):
         return str(self.id)
 
@@ -112,3 +115,14 @@ class ContactUs(models.Model):
 
     class Meta:
         verbose_name_plural = "ContactUs"
+
+
+# image field
+class ImageModel(models.Model):
+    id = models.AutoField(primary_key=True)
+    image = models.ImageField(upload_to="profile/")
+    user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
