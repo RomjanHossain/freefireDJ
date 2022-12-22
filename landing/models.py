@@ -26,6 +26,7 @@ class CarasolModel(models.Model):
         return self.carasol_title
 
     class Meta:
+        verbose_name_plural = "Slider"
         ordering = ["-carasol_title"]
 
 
@@ -58,10 +59,12 @@ class Items(models.Model):
     player_type = models.CharField(max_length=50, choices=PLAYER_TYPES, default="id")
 
     def display_service(self):
-        return self.service.title
+        # return self.service.title
+        return "{} - {} - {}tk".format(self.service.title, self.diamond, self.price)
 
     def __str__(self):
-        return self.service.title + " " + self.diamond + "💎" + str(self.price) + "৳"
+        # return self.service.title
+        return "{} - {} - {}tk".format(self.service.title, self.diamond, self.price)
 
     class Meta:
         verbose_name_plural = "Items"
@@ -99,10 +102,10 @@ class Buy(models.Model):
     trxId = models.CharField(max_length=50)
 
     def __str__(self):
-        return str(self.id)
+        return "{}".format(self.item)
 
     class Meta:
-        verbose_name_plural = "Buy"
+        verbose_name_plural = "Orders"
         ordering = ["-date"]
 
 
@@ -136,3 +139,6 @@ class ImageModel(models.Model):
         # user = Token.objects.get(key=self.user)
         # return self.user.username
         return self.user
+
+    class Meta:
+        verbose_name_plural = "Profile Picture"
