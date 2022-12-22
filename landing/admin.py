@@ -84,11 +84,11 @@ class UserAdminConfig(UserAdmin):
     search_fields = ("username", "email", "phone")
     list_filter = ("username", "email", "phone", "is_active", "is_staff")
     # ordering = ("-start_date",)
-    list_display = (
-        "username",
-        "email",
-        "phone",
-    ) + UserAdmin.list_display
+    # list_display = (
+    #     "username",
+    #     "email",
+    #     "phone",
+    # ) + UserAdmin.list_display
 
     fieldsets = (
         (None, {"fields": ("username", "email", "phone", "password")}),
