@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, User
 from django.db import models
+from rest_framework.authtoken.models import Token
 
 
 class NewUser(AbstractUser):
@@ -44,13 +45,23 @@ class Services(models.Model):
 
 
 class Items(models.Model):
+    PLAYER_TYPES = (
+        ("id", "id"),
+        ("account", "account"),
+    )
     id = models.AutoField(primary_key=True)
     price = models.IntegerField()
-    diamond = models.IntegerField()
+    # diamond = models.IntegerField()
+    # diamond chartfield
+    diamond = models.CharField(max_length=50)
     service = models.ForeignKey(Services, on_delete=models.CASCADE)
+    player_type = models.CharField(max_length=50, choices=PLAYER_TYPES, default="id")
+
+    def display_service(self):
+        return self.service.title
 
     def __str__(self):
-        return str(self.id)
+        return self.service.title + " " + self.diamond + "💎" + str(self.price) + "৳"
 
     class Meta:
         verbose_name_plural = "Items"
@@ -112,3 +123,16 @@ class ContactUs(models.Model):
 
     class Meta:
         verbose_name_plural = "ContactUs"
+
+
+# image field
+class ImageModel(models.Model):
+    id = models.AutoField(primary_key=True)
+    image = models.ImageField(upload_to="profile/")
+    user = models.CharField(max_length=50)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        # user = Token.objects.get(key=self.user)
+        # return self.user.username
+        return self.user

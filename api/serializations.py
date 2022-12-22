@@ -1,7 +1,9 @@
+from django.contrib.auth.password_validation import validate_password
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from landing.models import (Buy, CarasolModel, ContactUs, Items, NewUser,
-                            PaymentMethod, Services)
+from landing.models import (Buy, CarasolModel, ContactUs, ImageModel, Items,
+                            NewUser, PaymentMethod, Services)
 
 
 class CarasolModelSerializer(ModelSerializer):
@@ -94,3 +96,37 @@ class UpdateUserSerializer(ModelSerializer):
         instance.username = validated_data.get("username", instance.username)
         instance.save()
         return instance
+
+
+# ChangePasswordSerializer
+class ChangePasswordSerializer(ModelSerializer):
+    model = NewUser
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        validate_password(value)
+        return value
+
+    # def validate(self, data):
+    #     user = self.context["request"].user
+    #     if not user.check_password(data["old_password"]):
+    #         raise serializers.ValidationError("Wrong password")
+    #     return data
+
+    # def update(self, instance, validated_data):
+    #     instance.set_password(validated_data["new_password"])
+    #     instance.save()
+    #     return instance
+
+    class Meta:
+        model = NewUser
+        fields = ("old_password", "new_password")
+
+
+# image serializer
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImageModel
+        # fields = ("image",)
+        fields = "__all__"
