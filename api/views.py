@@ -249,7 +249,8 @@ def image_detail(request):
     try:
         # image = ImageModel.objects.get(pk=pk)
         # get image using user
-        _image = ImageModel.objects.filter(user=request.auth.key)
+        _image = ImageModel.objects.filter(user=request.user.id)
+        print("this is user id -> ", request.user.id)
     except ImageModel.DoesNotExist:
         return Response(status=HTTP_404_NOT_FOUND)
 
@@ -285,11 +286,12 @@ class ImageUploadView(CreateAPIView):
     serializer_class = ImageSerializer
 
     def post(self, request, *args, **kwargs):
+        # get user id
         # get user field data
-        _user = request.data.get("user")
+        # _user = request.data.get("user")
+        print("this is user -> ", request.user.id)
         _image = request.FILES.get("image")
         print("this is image -> ", _image)
-        print("this is user -> ", _user)
         serializer = self.get_serializer(data={"user": _user, "image": _image})
         if serializer.is_valid():
             # check if user has already uploaded an image
