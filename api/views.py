@@ -366,3 +366,10 @@ class GetPaymentMethod(RetrieveAPIView):
     serializer_class = PaymentMethodSerializer
     queryset = PaymentMethod.objects.all()
     lookup_field = "pk"
+
+
+class GetSingleService(RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ServicesSerializer
+    queryset = Services.objects.all()
+    lookup_field = "pk"
