@@ -10,9 +10,11 @@ admin.site.index_title = "Welcome to Free Fire Admin Portal"
 admin.site.site_url = "https://www.freefire.com.bd"
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
     path("", include("landing.urls")),
+    path("admin/", admin.site.urls),
     path("api/", include("api.urls")),
+    # path("auth/", include("rest_auth.urls")),
+    # path("auth/registration/", include("rest_auth.registration.urls")),
 ]
 
 if settings.DEBUG:  # new

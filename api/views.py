@@ -1,4 +1,6 @@
 from django.contrib.auth import update_session_auth_hash
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import (CreateAPIView, ListAPIView,
                                      RetrieveAPIView, RetrieveUpdateAPIView,
@@ -81,6 +83,19 @@ class BuyListAPIView(RetrieveAPIView):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
+
+
+class BuyCreateAPIView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Buy.objects.all()
+    serializer_class = BuySerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 class ContactUsListAPIView(RetrieveAPIView):
@@ -322,3 +337,32 @@ class ProfilePictureAPIView(RetrieveUpdateAPIView):
         queryset = self.get_object()
         queryset.profile_picture.delete()
         return Response(status=HTTP_204_NO_CONTENT)
+
+
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        print("post method called in new CustomAuthToken")
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key, "user_id": user.pk, "email": user.email})
+
+
+# get single item from the database
+
+
+class GetSingleItemView(RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ItemsSerializer
+    queryset = Items.objects.all()
+    lookup_field = "pk"
+
+
+class GetPaymentMethod(RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PaymentMethodSerializer
+    queryset = PaymentMethod.objects.all()
+    lookup_field = "pk"
