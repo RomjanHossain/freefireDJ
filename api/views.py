@@ -91,6 +91,7 @@ class BuyCreateAPIView(CreateAPIView):
     serializer_class = BuySerializer
 
     def post(self, request, *args, **kwargs):
+        request.data._mutable = True
         user_id = request.user.id
         request.data["user"] = user_id
         serializer = self.get_serializer(data=request.data)
