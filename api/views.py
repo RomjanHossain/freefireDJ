@@ -349,3 +349,20 @@ class CustomAuthToken(ObtainAuthToken):
         user = serializer.validated_data["user"]
         token, created = Token.objects.get_or_create(user=user)
         return Response({"token": token.key, "user_id": user.pk, "email": user.email})
+
+
+# get single item from the database
+
+
+class GetSingleItemView(RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ItemsSerializer
+    queryset = Items.objects.all()
+    lookup_field = "pk"
+
+
+class GetPaymentMethod(RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PaymentMethodSerializer
+    queryset = PaymentMethod.objects.all()
+    lookup_field = "pk"

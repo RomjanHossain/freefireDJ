@@ -36,6 +36,17 @@ class BuySerializer(ModelSerializer):
         model = Buy
         fields = "__all__"
 
+        # fields = [
+        # "id",
+        # "date",
+        # "item",
+        # "user",
+        #     "payment_method",
+        #     "status",
+        #     "sender_number",
+        #     "trxId",
+        # ]
+
 
 class ContactUsSerializer(ModelSerializer):
     class Meta:
