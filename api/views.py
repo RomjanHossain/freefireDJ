@@ -292,12 +292,14 @@ class ImageUploadView(CreateAPIView):
         print("this is user -> ", request.user.id)
         _image = request.FILES.get("image")
         print("this is image -> ", _image)
-        serializer = self.get_serializer(data={"user": _user, "image": _image})
+        serializer = self.get_serializer(
+            data={"user": request.user.id, "image": _image}
+        )
         if serializer.is_valid():
             # check if user has already uploaded an image
-            if ImageModel.objects.filter(user=_user).exists():
+            if ImageModel.objects.filter(user=request.user.id).exists():
                 # delete the previous image
-                ImageModel.objects.filter(user=_user).delete()
+                ImageModel.objects.filter(user=request.user.id).delete()
             serializer.save()
             return Response(serializer.data, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
