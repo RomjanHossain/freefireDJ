@@ -2,8 +2,8 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from landing.models import (Buy, CarasolModel, ContactUs, ImageModel, Items,
-                            NewUser, PaymentMethod, Services)
+from landing.models import (Buy, CarasolModel, ImageModel, Items, NewUser,
+                            PaymentMethod, Services)
 
 
 class CarasolModelSerializer(ModelSerializer):
@@ -48,10 +48,10 @@ class BuySerializer(ModelSerializer):
         # ]
 
 
-class ContactUsSerializer(ModelSerializer):
-    class Meta:
-        model = ContactUs
-        fields = "__all__"
+# class ContactUsSerializer(ModelSerializer):
+#     class Meta:
+#         model = ContactUs
+#         fields = "__all__"
 
 
 class NewUserSerializer(ModelSerializer):

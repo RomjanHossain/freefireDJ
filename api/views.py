@@ -14,12 +14,12 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_409_CONFLICT)
 
 from api.serializations import (BuySerializer, CarasolModelSerializer,
-                                ChangePasswordSerializer, ContactUsSerializer,
-                                ImageSerializer, ItemsSerializer,
-                                NewUserSerializer, PaymentMethodSerializer,
-                                ServicesSerializer, UpdateUserSerializer)
-from landing.models import (Buy, CarasolModel, ContactUs, ImageModel, Items,
-                            NewUser, PaymentMethod, Services)
+                                ChangePasswordSerializer, ImageSerializer,
+                                ItemsSerializer, NewUserSerializer,
+                                PaymentMethodSerializer, ServicesSerializer,
+                                UpdateUserSerializer)
+from landing.models import (Buy, CarasolModel, ImageModel, Items, NewUser,
+                            PaymentMethod, Services)
 
 
 class CarasolModelListAPIView(RetrieveAPIView):
@@ -101,15 +101,15 @@ class BuyCreateAPIView(CreateAPIView):
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
-class ContactUsListAPIView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = ContactUs.objects.all()
-    serializer_class = ContactUsSerializer
+# class ContactUsListAPIView(RetrieveAPIView):
+#     permission_classes = [IsAuthenticated]
+#     queryset = ContactUs2.objects.all()
+#     serializer_class = ContactUsSerializer
 
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=HTTP_200_OK)
+#     def get(self, request, *args, **kwargs):
+#         queryset = self.get_queryset()
+#         serializer = self.get_serializer(queryset, many=True)
+#         return Response(serializer.data, status=HTTP_200_OK)
 
 
 # get the user buy history
