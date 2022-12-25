@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import (Buy, CarasolModel, ContactUs, ImageModel, Items, NewUser,
+from .models import (Buy, CarasolModel, ImageModel, Items, NewUser,
                      PaymentMethod, Services)
 
 
@@ -116,4 +116,3 @@ class UserAdminConfig(UserAdmin):
 
 
 admin.site.register(NewUser, UserAdminConfig)
-admin.site.register(ContactUs)
