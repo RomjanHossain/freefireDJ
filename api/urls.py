@@ -3,8 +3,8 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from .views import (BuyCreateAPIView, BuyHistoryAPIView, BuyListAPIView,
                     CarasolModelListAPIView, ChangePasswordView,
-                    ContactUsListAPIView, CustomAuthToken, GetPaymentMethod,
-                    GetSingleItemView, ImageUploadView, ItemsListAPIView,
+                    CustomAuthToken, GetPaymentMethod, GetSingleItemView,
+                    GetSingleService, ImageUploadView, ItemsListAPIView,
                     LogoutAPIView, PaymentMethodListAPIView, ProfileAPIView,
                     ProfilePictureAPIView, RegisterAPIView,
                     ServicesListAPIView, UpdateProfileAPIView, image_detail,
@@ -30,6 +30,7 @@ urlpatterns = [
     # landing stuff
     path("carasol/", CarasolModelListAPIView.as_view(), name="carasol"),
     path("services/", ServicesListAPIView.as_view(), name="services"),
+    path("service/<pk>/", GetSingleService.as_view(), name="service-detail"),
     path("items/<pk>/", ItemsListAPIView.as_view(), name="items"),
     path("get-single-item/<pk>/", GetSingleItemView.as_view(), name="get-item"),
     path("payment-method/<pk>", PaymentMethodListAPIView.as_view(), name="payment"),
@@ -37,5 +38,5 @@ urlpatterns = [
     path("buy/", BuyListAPIView.as_view(), name="buy"),
     path("order/", BuyCreateAPIView.as_view(), name="order"),
     path("buy-history/", BuyHistoryAPIView.as_view(), name="buy-history"),
-    path("contact/", ContactUsListAPIView.as_view(), name="contact"),
+    # path("contact/", ContactUsListAPIView.as_view(), name="contact"),
 ]

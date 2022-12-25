@@ -141,6 +141,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "/static/"
+SITE_URL = "http://topupltd.com"
 # STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 # STATICFILES_DIRS = [
 #     BASE_DIR / "static",

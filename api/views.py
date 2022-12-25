@@ -14,12 +14,12 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_409_CONFLICT)
 
 from api.serializations import (BuySerializer, CarasolModelSerializer,
-                                ChangePasswordSerializer, ContactUsSerializer,
-                                ImageSerializer, ItemsSerializer,
-                                NewUserSerializer, PaymentMethodSerializer,
-                                ServicesSerializer, UpdateUserSerializer)
-from landing.models import (Buy, CarasolModel, ContactUs, ImageModel, Items,
-                            NewUser, PaymentMethod, Services)
+                                ChangePasswordSerializer, ImageSerializer,
+                                ItemsSerializer, NewUserSerializer,
+                                PaymentMethodSerializer, ServicesSerializer,
+                                UpdateUserSerializer)
+from landing.models import (Buy, CarasolModel, ImageModel, Items, NewUser,
+                            PaymentMethod, Services)
 
 
 class CarasolModelListAPIView(RetrieveAPIView):
@@ -91,6 +91,9 @@ class BuyCreateAPIView(CreateAPIView):
     serializer_class = BuySerializer
 
     def post(self, request, *args, **kwargs):
+        request.data._mutable = True
+        user_id = request.user.id
+        request.data["user"] = user_id
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -98,15 +101,15 @@ class BuyCreateAPIView(CreateAPIView):
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
-class ContactUsListAPIView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = ContactUs.objects.all()
-    serializer_class = ContactUsSerializer
+# class ContactUsListAPIView(RetrieveAPIView):
+#     permission_classes = [IsAuthenticated]
+#     queryset = ContactUs2.objects.all()
+#     serializer_class = ContactUsSerializer
 
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=HTTP_200_OK)
+#     def get(self, request, *args, **kwargs):
+#         queryset = self.get_queryset()
+#         serializer = self.get_serializer(queryset, many=True)
+#         return Response(serializer.data, status=HTTP_200_OK)
 
 
 # get the user buy history
@@ -246,7 +249,8 @@ def image_detail(request):
     try:
         # image = ImageModel.objects.get(pk=pk)
         # get image using user
-        _image = ImageModel.objects.filter(user=request.auth.key)
+        _image = ImageModel.objects.filter(user=request.user.id)
+        print("this is user id -> ", request.user.id)
     except ImageModel.DoesNotExist:
         return Response(status=HTTP_404_NOT_FOUND)
 
@@ -282,17 +286,20 @@ class ImageUploadView(CreateAPIView):
     serializer_class = ImageSerializer
 
     def post(self, request, *args, **kwargs):
+        # get user id
         # get user field data
-        _user = request.data.get("user")
+        # _user = request.data.get("user")
+        print("this is user -> ", request.user.id)
         _image = request.FILES.get("image")
         print("this is image -> ", _image)
-        print("this is user -> ", _user)
-        serializer = self.get_serializer(data={"user": _user, "image": _image})
+        serializer = self.get_serializer(
+            data={"user": request.user.id, "image": _image}
+        )
         if serializer.is_valid():
             # check if user has already uploaded an image
-            if ImageModel.objects.filter(user=_user).exists():
+            if ImageModel.objects.filter(user=request.user.id).exists():
                 # delete the previous image
-                ImageModel.objects.filter(user=_user).delete()
+                ImageModel.objects.filter(user=request.user.id).delete()
             serializer.save()
             return Response(serializer.data, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -365,4 +372,11 @@ class GetPaymentMethod(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = PaymentMethodSerializer
     queryset = PaymentMethod.objects.all()
+    lookup_field = "pk"
+
+
+class GetSingleService(RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ServicesSerializer
+    queryset = Services.objects.all()
     lookup_field = "pk"
