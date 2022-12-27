@@ -39,5 +39,5 @@ urlpatterns = [
     path("order/", BuyCreateAPIView.as_view(), name="order"),
     path("buy-history/", BuyHistoryAPIView.as_view(), name="buy-history"),
     # path("contact/", ContactUsListAPIView.as_view(), name="contact"),
-    path("dialog/", GetDialog.as_view(), name="dialog"),
+    path("dialog/<pk>", GetDialog.as_view(), name="dialog"),
 ]
