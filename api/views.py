@@ -387,3 +387,4 @@ class GetDialog(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = DialogSerializer
     queryset = Dialog.objects.all()
+    lookup_field = "pk"
