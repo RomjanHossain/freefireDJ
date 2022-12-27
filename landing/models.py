@@ -102,13 +102,9 @@ class Buy(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICE, default="Pending")
     sender_number = models.CharField(max_length=50)
     trxId = models.CharField(max_length=50)
-    player_id = models.CharField(max_length=50, blank=True, null=True, default="1234")
-    player_account = models.CharField(
-        max_length=50, blank=True, null=True, default="1234"
-    )
-    player_password = models.CharField(
-        max_length=50, blank=True, null=True, default="password"
-    )
+    player_id = models.CharField(max_length=50, blank=True, null=True, default="")
+    player_account = models.CharField(max_length=50, blank=True, null=True, default="")
+    player_password = models.CharField(max_length=50, blank=True, null=True, default="")
 
     def __str__(self):
         return "{}".format(self.item)
@@ -155,6 +151,14 @@ class Buy(models.Model):
 
 #     class Meta:
 #         verbose_name_plural = "ContactUs"
+
+# dialog model
+class Dialog(models.Model):
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.title
 
 
 # image field

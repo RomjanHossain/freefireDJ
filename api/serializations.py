@@ -2,8 +2,8 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from landing.models import (Buy, CarasolModel, ImageModel, Items, NewUser,
-                            PaymentMethod, Services)
+from landing.models import (Buy, CarasolModel, Dialog, ImageModel, Items,
+                            NewUser, PaymentMethod, Services)
 
 
 class CarasolModelSerializer(ModelSerializer):
@@ -140,4 +140,11 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageModel
         # fields = ("image",)
+        fields = "__all__"
+
+
+# dialog serializer
+class DialogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dialog
         fields = "__all__"
