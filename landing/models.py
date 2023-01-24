@@ -105,6 +105,7 @@ class Buy(models.Model):
     player_id = models.CharField(max_length=50, blank=True, null=True, default="")
     player_account = models.CharField(max_length=50, blank=True, null=True, default="")
     player_password = models.CharField(max_length=50, blank=True, null=True, default="")
+    player_type = models.CharField(max_length=30, blank=True, null=True, default="")
 
     def __str__(self):
         return "{}".format(self.item)
