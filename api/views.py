@@ -14,12 +14,12 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_409_CONFLICT)
 
 from api.serializations import (BuySerializer, CarasolModelSerializer,
-                                ChangePasswordSerializer, ImageSerializer,
-                                ItemsSerializer, NewUserSerializer,
-                                PaymentMethodSerializer, ServicesSerializer,
-                                UpdateUserSerializer)
-from landing.models import (Buy, CarasolModel, ImageModel, Items, NewUser,
-                            PaymentMethod, Services)
+                                ChangePasswordSerializer, DialogSerializer,
+                                ImageSerializer, ItemsSerializer,
+                                NewUserSerializer, PaymentMethodSerializer,
+                                ServicesSerializer, UpdateUserSerializer)
+from landing.models import (Buy, CarasolModel, Dialog, ImageModel, Items,
+                            NewUser, PaymentMethod, Services)
 
 
 class CarasolModelListAPIView(RetrieveAPIView):
@@ -87,7 +87,8 @@ class BuyListAPIView(RetrieveAPIView):
 
 class BuyCreateAPIView(CreateAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = Buy.objects.all()
+    model = Buy
+    # queryset = Buy.objects.all()
     serializer_class = BuySerializer
 
     def post(self, request, *args, **kwargs):
@@ -379,4 +380,11 @@ class GetSingleService(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ServicesSerializer
     queryset = Services.objects.all()
+    lookup_field = "pk"
+
+
+class GetDialog(RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = DialogSerializer
+    queryset = Dialog.objects.all()
     lookup_field = "pk"
