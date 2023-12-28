@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import (Buy, CarasolModel, ContactUs, Items, NewUser,
+from .models import (Buy, CarasolModel, Dialog, ImageModel, Items, NewUser,
                      PaymentMethod, Services)
 
 
@@ -25,7 +25,7 @@ class ServicesAdmin(admin.ModelAdmin):
 
 @admin.register(Items)
 class ItemsAdmin(admin.ModelAdmin):
-    list_display = ("price", "diamond")
+    list_display = ("display_service", "price", "diamond")
     list_editable = ("price",)
     list_display_links = ("diamond",)
     list_per_page = 10
@@ -55,6 +55,18 @@ class BuyAdmin(admin.ModelAdmin):
     search_fields = ("user", "payment_method", "status", "sender_number", "trxId")
 
 
+@admin.register(ImageModel)
+class ImageModelAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "uploaded_at",
+        "image",
+    )
+    list_per_page = 10
+    editable = ("image",)
+    search_fields = ("user",)
+
+
 # @admin.register(NewUser)
 # class NewUserAdmin(admin.ModelAdmin):
 #     list_display = (
@@ -72,11 +84,11 @@ class UserAdminConfig(UserAdmin):
     search_fields = ("username", "email", "phone")
     list_filter = ("username", "email", "phone", "is_active", "is_staff")
     # ordering = ("-start_date",)
-    list_display = (
-        "username",
-        "email",
-        "phone",
-    ) + UserAdmin.list_display
+    # list_display = (
+    #     "username",
+    #     "email",
+    #     "phone",
+    # ) + UserAdmin.list_display
 
     fieldsets = (
         (None, {"fields": ("username", "email", "phone", "password")}),
@@ -104,4 +116,4 @@ class UserAdminConfig(UserAdmin):
 
 
 admin.site.register(NewUser, UserAdminConfig)
-admin.site.register(ContactUs)
+admin.site.register(Dialog)

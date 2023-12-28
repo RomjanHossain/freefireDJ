@@ -1,0 +1,8 @@
+freefire/__pycache__/*
+landing/__pycache__/*
+landing/migrations/*
+landing/migrations/__pycache__/*
+
+
+freefire/__pycache__/settings.cpython-310.pyc
+media/*
